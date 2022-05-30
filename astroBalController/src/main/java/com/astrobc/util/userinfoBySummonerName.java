@@ -11,6 +11,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.json.JSONObject;
+import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
 
 
