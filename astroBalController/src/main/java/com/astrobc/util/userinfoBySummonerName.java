@@ -8,19 +8,20 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
 import org.json.JSONObject;
-import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
+
 
 
 @Component
 public class userinfoBySummonerName {
 
-	private static void getUserInfo() {
+	public static HashMap<String, String> getUserInfo() {
 		String userId = "hide on bush".replace(" ", "%20");
-		String api_key = "RGAPI-d1c4d29b-7d57-47d2-8b17-e5cd6ad4647f";
+		String api_key = "RGAPI-85a702cb-e0cb-4c8c-ad91-d2000eaa2ed4";
 		String requestURL = "https://kr.api.riotgames.com/lol/summoner/v4/summoners/by-name/" + userId;
 		Map<String, String> requestHeaders = new HashMap<>();
 		requestHeaders.put("User-Agent",
@@ -31,20 +32,14 @@ public class userinfoBySummonerName {
 		requestHeaders.put("X-Riot-Token", api_key);
 		String output = get(requestURL, requestHeaders);
 		JSONObject jsonObject = new JSONObject(output);
-		String id = (String) jsonObject.get("id");
-		String accountId = (String) jsonObject.get("accountId");
-		String puuid = (String) jsonObject.get("puuid");
-		String name = (String) jsonObject.get("name");
-		String revisionDate = (String) jsonObject.get("revisionDate");
-		int summonerLevel = (int) jsonObject.get("summonerLevel");
 		
-		System.out.println(id);
-		System.out.println(accountId);
-		System.out.println(puuid);
-		System.out.println(name);
-		System.out.println(revisionDate);
-		System.out.println(summonerLevel);
-		
+		Iterator<String> itr = jsonObject.keys();
+		HashMap<String, String> result = new HashMap<String, String>();
+		while (itr.hasNext()) {
+			String key = itr.next().toString();
+			result.put(key, jsonObject.get(key).toString());
+		}
+		return result;
 		
 
 	}
