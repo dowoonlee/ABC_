@@ -11,16 +11,19 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.stereotype.Component;
+
+import com.astrobc.main.model.dto.Summoner;
 
 
 
 @Component
 public class userinfoBySummonerName {
 
-	public static HashMap<String, String> getUserInfo() {
-		String userId = "hide on bush".replace(" ", "%20");
+	public static HashMap<String, Object> getUserInfo(String userId) {
+		userId = userId.replace(" ", "%20");
 		String api_key = "RGAPI-85a702cb-e0cb-4c8c-ad91-d2000eaa2ed4";
 		String requestURL = "https://kr.api.riotgames.com/lol/summoner/v4/summoners/by-name/" + userId;
 		Map<String, String> requestHeaders = new HashMap<>();
@@ -33,12 +36,25 @@ public class userinfoBySummonerName {
 		String output = get(requestURL, requestHeaders);
 		JSONObject jsonObject = new JSONObject(output);
 		
-		Iterator<String> itr = jsonObject.keys();
-		HashMap<String, String> result = new HashMap<String, String>();
-		while (itr.hasNext()) {
-			String key = itr.next().toString();
-			result.put(key, jsonObject.get(key).toString());
+		HashMap<String, Object> result = new HashMap<String, Object>();
+		try {
+			Summoner summoner = new Summoner();
+			summoner.setAccountId(jsonObject.getString("accountId"));
+			summoner.setId(jsonObject.getString("id"));
+			summoner.setName(jsonObject.getString("name"));
+			summoner.setProfileIconId(jsonObject.getInt("profileIconId"));
+			summoner.setPuuid(jsonObject.getString("puuid"));
+			summoner.setRevisionDate(jsonObject.getLong("revisionDate"));
+			summoner.setSummonerLevel(jsonObject.getLong("summonerLevel"));
+			result.put("message", "OK");
+			result.put("statusCode", 200);
+			result.put("summoner", summoner);
+			
+		}catch (JSONException e) {
+			result.put("message", "FORBIDDEN");
+			result.put("statusCode", 403);
 		}
+		
 		return result;
 		
 
@@ -102,7 +118,6 @@ public class userinfoBySummonerName {
 
 			String line;
 			while ((line = lineReader.readLine()) != null) {
-				System.out.println(line);
 				responseBody.append(line);
 			}
 
