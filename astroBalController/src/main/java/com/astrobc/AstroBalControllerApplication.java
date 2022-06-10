@@ -3,7 +3,7 @@ package com.astrobc;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
-import com.astrobc.util.userinfoBySummonerName;
+import com.astrobc.util.riotAPIUtil;
 
 @SpringBootApplication
 public class AstroBalControllerApplication {

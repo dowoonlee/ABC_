@@ -10,9 +10,27 @@ export default new Vuex.Store({
   getters: {},
   mutations: {},
   actions: {
-    getUserinfo(text, payload) {
+    getSummoner(text, payload) {
       text;
-      const API_URL = `${REST_API}/userinfo`;
+      const API_URL = `${REST_API}/summoner`;
+      axios({
+        url: API_URL,
+        method: "POST",
+        params: {
+          region: payload.region,
+          summonerName: payload.summonerName,
+        },
+      })
+        .then((res) => {
+          console.log(res.data);
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    },
+    getLeagueEntry(text, payload) {
+      text;
+      const API_URL = `${REST_API}/leagueEntry`;
       axios({
         url: API_URL,
         method: "POST",

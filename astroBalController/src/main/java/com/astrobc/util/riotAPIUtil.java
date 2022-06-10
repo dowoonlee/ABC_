@@ -11,20 +11,69 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.stereotype.Component;
 
+import com.astrobc.main.model.dto.LeagueEntry;
 import com.astrobc.main.model.dto.Summoner;
 
 
 
 @Component
-public class userinfoBySummonerName {
+public class riotAPIUtil {
+	private static String api_key = "RGAPI-a6768467-b08d-44f1-aaf5-5b36f92fd729";
+	
+	public static HashMap<String, Object> getLeagueEntry(String encryptedSummonerId) {
+		String requestURL = "https://kr.api.riotgames.com/lol/league/v4/entries/by-summoner/"+encryptedSummonerId;
+		Map<String, String> requestHeaders = new HashMap<>();
+		requestHeaders.put("User-Agent",
+				"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/102.0.5005.62 Safari/537.36");
+		requestHeaders.put("Accept-Language", "ko-KR,ko;q=0.9,en-US;q=0.8,en;q=0.7,ja;q=0.6,es;q=0.5");
+		requestHeaders.put("Accept-Charset", "application/x-www-form-urlencoded; charset=UTF-8");
+		requestHeaders.put("Origin", "https://developer.riotgames.com");
+		requestHeaders.put("X-Riot-Token", api_key);
+		String output = get(requestURL, requestHeaders);
+		JSONArray jsonArray = new JSONArray(output);
+		HashMap<String, Object> result = new HashMap<String, Object>();
+		if (jsonArray.isNull(0)) {
+			result.put("message", "FORBIDDEN");
+			result.put("statusCode", 403);
+		}else {
+			JSONObject jsonObject = (JSONObject) jsonArray.get(0);
+			
+			try {
+				LeagueEntry leagueEntry = new LeagueEntry();
+				leagueEntry.setFreshBlood(jsonObject.getBoolean("freshBlood"));
+				leagueEntry.setHotStreak(jsonObject.getBoolean("hotStreak"));
+				leagueEntry.setInactive(jsonObject.getBoolean("inactive"));
+				leagueEntry.setLeagueId(jsonObject.getString("leagueId"));
+				leagueEntry.setLeaguePoints(jsonObject.getInt("leaguePoints"));
+				leagueEntry.setLosses(jsonObject.getInt("losses"));
+				leagueEntry.setQueueType(jsonObject.getString("queueType"));
+				leagueEntry.setRank(jsonObject.getString("rank"));
+				leagueEntry.setSummonerId(jsonObject.getString("summonerId"));
+				leagueEntry.setSummonerName(jsonObject.getString("summonerName"));
+				leagueEntry.setTier(jsonObject.getString("tier"));
+				leagueEntry.setVeteran(jsonObject.getBoolean("veteran"));
+				leagueEntry.setWins(jsonObject.getInt("wins"));
+				result.put("message", "OK");
+				result.put("statusCode", 200);
+				result.put("leagueEntry", leagueEntry);
+				
+			}catch (JSONException e) {
+				result.put("message", "FORBIDDEN");
+				result.put("statusCode", 403);
+			}
+		}
+		
+		return result;
+		
+	}
 
-	public static HashMap<String, Object> getUserInfo(String userId) {
+	public static HashMap<String, Object> getSummoner(String userId) {
 		userId = userId.replace(" ", "%20");
-		String api_key = "RGAPI-85a702cb-e0cb-4c8c-ad91-d2000eaa2ed4";
 		String requestURL = "https://kr.api.riotgames.com/lol/summoner/v4/summoners/by-name/" + userId;
 		Map<String, String> requestHeaders = new HashMap<>();
 		requestHeaders.put("User-Agent",

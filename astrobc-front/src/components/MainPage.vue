@@ -41,7 +41,7 @@ export default {
   methods: {
     onSubmit(event) {
       event.preventDefault();
-      this.$store.dispatch("getUserinfo", this.payload);
+      this.$store.dispatch("getLeagueEntry", this.payload);
     },
   },
 };

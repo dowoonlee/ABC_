@@ -9,8 +9,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.astrobc.main.model.dto.LeagueEntry;
 import com.astrobc.main.model.dto.Summoner;
-import com.astrobc.util.userinfoBySummonerName;
+import com.astrobc.util.riotAPIUtil;
 
 @RestController
 @RequestMapping("/api")
@@ -19,14 +20,12 @@ public class mainController {
 	private static final String FAIL = "fail";
 
 	@Autowired
-	public userinfoBySummonerName UIbySumName;
+	public riotAPIUtil UIbySumName;
 	
 
-	@PostMapping("/userinfo")
-	public ResponseEntity<Summoner> userInfo(String region, String summonerName) {
-		System.out.println(summonerName);
-		System.out.println(region);
-		HashMap<String, Object> result = UIbySumName.getUserInfo(summonerName);
+	@PostMapping("/summoner")
+	public ResponseEntity<Summoner> getSummonerData(String region, String summonerName) {
+		HashMap<String, Object> result = riotAPIUtil.getSummoner(summonerName);
 		int statusCode = (int) result.get("statusCode");
 		if (statusCode == 403) {
 			Summoner summoner = new Summoner();
@@ -34,6 +33,27 @@ public class mainController {
 		} else {
 			Summoner summoner = (Summoner) result.get("summoner");
 			return new ResponseEntity<Summoner>(summoner, HttpStatus.OK);
+		}
+
+	}
+	@PostMapping("/leagueEntry")
+	public ResponseEntity<LeagueEntry> getLeagueEntryData(String region, String summonerName) {
+		HashMap<String, Object> result0 = riotAPIUtil.getSummoner(summonerName);
+		int statusCode = (int) result0.get("statusCode");
+		if (statusCode == 403) {
+			LeagueEntry leagueEntry = new LeagueEntry();
+			return new ResponseEntity<LeagueEntry>(leagueEntry, HttpStatus.FORBIDDEN);
+		} else {
+			Summoner summoner = (Summoner) result0.get("summoner");
+			HashMap<String, Object> result = riotAPIUtil.getLeagueEntry(summoner.getId());
+			statusCode = (int) result.get("statusCode");
+			if (statusCode == 403) {
+				LeagueEntry leagueEntry = new LeagueEntry();
+				return new ResponseEntity<LeagueEntry>(leagueEntry, HttpStatus.FORBIDDEN);
+			} else {
+				LeagueEntry leagueEntry = (LeagueEntry) result.get("leagueEntry");
+				return new ResponseEntity<LeagueEntry>(leagueEntry, HttpStatus.OK);
+			}
 		}
 
 	}
