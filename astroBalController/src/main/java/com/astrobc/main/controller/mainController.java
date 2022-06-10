@@ -1,8 +1,13 @@
 package com.astrobc.main.controller;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.HashMap;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.ResourceLoader;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -22,10 +27,18 @@ public class mainController {
 	@Autowired
 	public riotAPIUtil UIbySumName;
 	
+	@Autowired
+	private ResourceLoader resourceLoader;
 
 	@PostMapping("/summoner")
-	public ResponseEntity<Summoner> getSummonerData(String region, String summonerName) {
-		HashMap<String, Object> result = riotAPIUtil.getSummoner(summonerName);
+	public ResponseEntity<Summoner> getSummonerData(String region, String summonerName) throws IOException {
+		
+		Resource resource = resourceLoader.getResource("classpath:");
+		String filePath = resource.getURI().getPath() + "/static/key.dat";
+		BufferedReader reader = new BufferedReader(new FileReader(filePath));
+		String key = reader.readLine();
+		
+		HashMap<String, Object> result = riotAPIUtil.getSummoner(summonerName, key);
 		int statusCode = (int) result.get("statusCode");
 		if (statusCode == 403) {
 			Summoner summoner = new Summoner();
@@ -37,15 +50,21 @@ public class mainController {
 
 	}
 	@PostMapping("/leagueEntry")
-	public ResponseEntity<LeagueEntry> getLeagueEntryData(String region, String summonerName) {
-		HashMap<String, Object> result0 = riotAPIUtil.getSummoner(summonerName);
+	public ResponseEntity<LeagueEntry> getLeagueEntryData(String region, String summonerName) throws IOException {
+		
+		Resource resource = resourceLoader.getResource("classpath:");
+		String filePath = resource.getURI().getPath() + "/static/key.dat";
+		BufferedReader reader = new BufferedReader(new FileReader(filePath));
+		String key = reader.readLine();
+		
+		HashMap<String, Object> result0 = riotAPIUtil.getSummoner(summonerName, key);
 		int statusCode = (int) result0.get("statusCode");
 		if (statusCode == 403) {
 			LeagueEntry leagueEntry = new LeagueEntry();
 			return new ResponseEntity<LeagueEntry>(leagueEntry, HttpStatus.FORBIDDEN);
 		} else {
 			Summoner summoner = (Summoner) result0.get("summoner");
-			HashMap<String, Object> result = riotAPIUtil.getLeagueEntry(summoner.getId());
+			HashMap<String, Object> result = riotAPIUtil.getLeagueEntry(summoner.getId(), key);
 			statusCode = (int) result.get("statusCode");
 			if (statusCode == 403) {
 				LeagueEntry leagueEntry = new LeagueEntry();

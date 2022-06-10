@@ -8,7 +8,6 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 
 import org.json.JSONArray;
@@ -23,9 +22,9 @@ import com.astrobc.main.model.dto.Summoner;
 
 @Component
 public class riotAPIUtil {
-	private static String api_key = "RGAPI-a6768467-b08d-44f1-aaf5-5b36f92fd729";
 	
-	public static HashMap<String, Object> getLeagueEntry(String encryptedSummonerId) {
+	
+	public static HashMap<String, Object> getLeagueEntry(String encryptedSummonerId, String apiKey) throws IOException {
 		String requestURL = "https://kr.api.riotgames.com/lol/league/v4/entries/by-summoner/"+encryptedSummonerId;
 		Map<String, String> requestHeaders = new HashMap<>();
 		requestHeaders.put("User-Agent",
@@ -33,7 +32,7 @@ public class riotAPIUtil {
 		requestHeaders.put("Accept-Language", "ko-KR,ko;q=0.9,en-US;q=0.8,en;q=0.7,ja;q=0.6,es;q=0.5");
 		requestHeaders.put("Accept-Charset", "application/x-www-form-urlencoded; charset=UTF-8");
 		requestHeaders.put("Origin", "https://developer.riotgames.com");
-		requestHeaders.put("X-Riot-Token", api_key);
+		requestHeaders.put("X-Riot-Token", apiKey);
 		String output = get(requestURL, requestHeaders);
 		JSONArray jsonArray = new JSONArray(output);
 		HashMap<String, Object> result = new HashMap<String, Object>();
@@ -72,7 +71,7 @@ public class riotAPIUtil {
 		
 	}
 
-	public static HashMap<String, Object> getSummoner(String userId) {
+	public static HashMap<String, Object> getSummoner(String userId, String apiKey) throws IOException {
 		userId = userId.replace(" ", "%20");
 		String requestURL = "https://kr.api.riotgames.com/lol/summoner/v4/summoners/by-name/" + userId;
 		Map<String, String> requestHeaders = new HashMap<>();
@@ -81,7 +80,7 @@ public class riotAPIUtil {
 		requestHeaders.put("Accept-Language", "ko-KR,ko;q=0.9,en-US;q=0.8,en;q=0.7,ja;q=0.6,es;q=0.5");
 		requestHeaders.put("Accept-Charset", "application/x-www-form-urlencoded; charset=UTF-8");
 		requestHeaders.put("Origin", "https://developer.riotgames.com");
-		requestHeaders.put("X-Riot-Token", api_key);
+		requestHeaders.put("X-Riot-Token", apiKey);
 		String output = get(requestURL, requestHeaders);
 		JSONObject jsonObject = new JSONObject(output);
 		
